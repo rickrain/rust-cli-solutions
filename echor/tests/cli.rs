@@ -3,10 +3,11 @@ use predicates::prelude::*;
 use std::fs;
 
 type TestResult = Result<(), Box<dyn std::error::Error>>;
+static BINARY_NAME: &str = "echor";
 
 #[test]
 fn dies_no_args() -> TestResult {
-    let mut cmd = Command::cargo_bin("echor")?;
+    let mut cmd = Command::cargo_bin(BINARY_NAME)?;
     cmd.assert()
         .failure()
         .stderr(predicate::str::contains("USAGE"));
@@ -15,46 +16,39 @@ fn dies_no_args() -> TestResult {
 
 #[test]
 fn runs() -> TestResult {
-    let mut cmd = Command::cargo_bin("echor")?;
+    let mut cmd = Command::cargo_bin(BINARY_NAME)?;
     cmd.arg("hello").assert().success();
     Ok(())
 }
 
 #[test]
 fn hello1() -> TestResult {
-    let expected = fs::read_to_string("tests/expected/hello1.txt")?;
-    let mut cmd = Command::cargo_bin("echor")?;
-    cmd.arg("Hello world").assert().success().stdout(expected);
+    run_expected(&["Hello world"], "tests/expected/hello1.txt")?;
     Ok(())
 }
 
 #[test]
 fn hello2() -> TestResult {
-    let expected = fs::read_to_string("tests/expected/hello2.txt")?;
-    let mut cmd = Command::cargo_bin("echor")?;
-    cmd.args(vec!["Hello", "world"])
-        .assert()
-        .success()
-        .stdout(expected);
+    run_expected(&["Hello", "world"], "tests/expected/hello2.txt")?;
     Ok(())
 }
 
 #[test]
 fn hello1n() -> TestResult {
-    let expected = fs::read_to_string("tests/expected/hello1.n.txt")?;
-    let mut cmd = Command::cargo_bin("echor")?;
-    cmd.args(vec!["Hello world", "-n"])
-        .assert()
-        .success()
-        .stdout(expected);
+    run_expected(&["Hello world", "-n"], "tests/expected/hello1.n.txt")?;
     Ok(())
 }
 
 #[test]
 fn hello2n() -> TestResult {
-    let expected = fs::read_to_string("tests/expected/hello2.n.txt")?;
-    let mut cmd = Command::cargo_bin("echor")?;
-    cmd.args(vec!["Hello", "world", "-n"])
+    run_expected(&["Hello", "world", "-n"], "tests/expected/hello2.n.txt")?;
+    Ok(())
+}
+
+fn run_expected(args: &[&str], expected_file: &str) -> TestResult {
+    let expected = fs::read_to_string(expected_file)?;
+    let mut cmd = Command::cargo_bin(BINARY_NAME)?;
+    cmd.args(args)
         .assert()
         .success()
         .stdout(expected);
