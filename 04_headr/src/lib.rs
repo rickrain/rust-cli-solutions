@@ -15,7 +15,7 @@ pub struct Config {
 pub fn run(config: Config) -> MyResult<()> {
     let multiple_files = config.files.len() > 1;
     for (file_num, file) in config.files.iter().enumerate() {
-        match open(&file) {
+        match open(file) {
             Err(e) => eprintln!("{}: {}", file, e),
             Ok(mut file_buffer) => {
                 if multiple_files {
