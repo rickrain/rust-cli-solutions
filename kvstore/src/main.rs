@@ -51,23 +51,31 @@ fn main() -> Result<(), Error> {
     let mut db = Database::from_disk("kv.db")?;
 
     match matches.subcommand() {
-        Some(("get", _matches)) => {
-            todo!();
+        Some(("get", get_matches)) => {
+            let key = get_matches.value_of("key").unwrap();
+            match db.get(key) {
+                Some((k,v)) => {
+                    println!("{} : {}", k, v);
+                }
+                None => {
+                    println!("No entry found for key '{}'.", key);
+                }
+            }
         }
-        Some(("set", matches)) => {
-            let key = matches.value_of("key").unwrap();
-            let value = matches.value_of("value").unwrap();
+        Some(("set", set_matches)) => {
+            let key = set_matches.value_of("key").unwrap();
+            let value = set_matches.value_of("value").unwrap();
 
             db.insert(
                 key.to_string(),
                 value.to_string(),
-                matches.is_present("force"),
+                set_matches.is_present("force"),
             )?;
         }
-        Some(("remove", _matches)) => {
+        Some(("remove", _rm_matches)) => {
             todo!();
         }
-        Some(("init", _matches)) => {
+        Some(("init", _init_matches)) => {
             db.init()?;
         }
         _ => {
@@ -125,6 +133,10 @@ impl Database {
             map: hashmap,
             db_filename: path.to_string(),
         })
+    }
+
+    fn get(&self, key: &str) -> Option<(&String, &String)> {
+        self.map.get_key_value(key)
     }
 
     // Insert a new key/value pair into the database.
