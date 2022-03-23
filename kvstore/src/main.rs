@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::fs::OpenOptions;
-use std::io::{Read, Write};
+use std::io::{Error, ErrorKind, Read, Write};
 use std::panic;
 
 use clap::{Arg, Command};
 
-fn main() -> Result<(), std::io::Error> {
+fn main() -> Result<(), Error> {
     let arg_key = Arg::new("key")
         .index(1)
         .takes_value(true)
@@ -57,14 +57,18 @@ fn main() -> Result<(), std::io::Error> {
             let key = matches.value_of("key").unwrap();
             let value = matches.value_of("value").unwrap();
 
-            db.insert(key.to_string(), value.to_string());
+            db.insert(
+                key.to_string(),
+                value.to_string(),
+                matches.is_present("force"),
+            )?;
         }
         Some(("remove", _matches)) => {
             todo!();
         }
         _ => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            return Err(Error::new(
+                ErrorKind::Other,
                 "Subcommand not specified or was unknown.",
             ));
         }
@@ -90,7 +94,7 @@ impl Drop for Database {
 impl Database {
     // Read a key/value database from disk into memory.
     // If the specified file doesn't exist, create it.
-    fn from_disk(path: &str) -> Result<Database, std::io::Error> {
+    fn from_disk(path: &str) -> Result<Database, Error> {
         // Open existing or create a new key/value database file.
         let mut file = OpenOptions::new()
             .read(true)
@@ -120,9 +124,22 @@ impl Database {
     }
 
     // Insert a new key/value pair into the database.
-    // If the key already exists, it is updated with new value.
-    fn insert(&mut self, key: String, value: String) {
+    // Replaces existing entry if 'replace_existing' is true.
+    fn insert(
+        &mut self,
+        key: String,
+        value: String,
+        replace_existing: bool,
+    ) -> std::io::Result<bool> {
+        if (self.map.contains_key(&key)) && (!replace_existing) {
+            return Err(Error::new(
+                ErrorKind::AlreadyExists,
+                format!("{} already exists in database.", key),
+            ));
+        }
         self.map.insert(key, value);
+
+        Ok(true)
     }
 
     // Persist the key/value database to disk.
