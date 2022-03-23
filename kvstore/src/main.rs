@@ -72,8 +72,17 @@ fn main() -> Result<(), Error> {
                 set_matches.is_present("force"),
             )?;
         }
-        Some(("remove", _rm_matches)) => {
-            todo!();
+        Some(("remove", rm_matches)) => {
+            let key = rm_matches.value_of("key").unwrap();
+            match db.remove(key) {
+                Some((k,v)) => {
+                    println!("({} : {}) removed from database.", k, v);
+                }
+                None => {
+                    println!("No entry found for key '{}'.", key);
+                }
+            }
+
         }
         Some(("init", _init_matches)) => {
             db.init()?;
@@ -156,6 +165,11 @@ impl Database {
         self.map.insert(key, value);
 
         Ok(true)
+    }
+
+    // Remove an entry from the database.
+    fn remove(&mut self, key: &str) -> Option<(String, String)> {
+        self.map.remove_entry(key)
     }
 
     // Initialize a new empty key/value database.
