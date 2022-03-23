@@ -3,13 +3,72 @@ use std::fs::OpenOptions;
 use std::io::{Read, Write};
 use std::panic;
 
+use clap::{Arg, Command};
+
 fn main() -> Result<(), std::io::Error> {
-    let mut arguments = std::env::args().skip(1);
-    let key = arguments.next().unwrap();
-    let value = arguments.next().unwrap();
+    let arg_key = Arg::new("key")
+        .index(1)
+        .takes_value(true)
+        .required(true)
+        .help("The key.");
+
+    let arg_value = Arg::new("value")
+        .index(2)
+        .takes_value(true)
+        .required(true)
+        .help("The value.");
+
+    let matches = Command::new(clap::crate_name!())
+        .version(clap::crate_version!())
+        .author(clap::crate_authors!())
+        .about(clap::crate_description!())
+        .subcommand(
+            Command::new("get")
+                .about("Gets the value in the database associated with a given key.")
+                .arg(&arg_key),
+        )
+        .subcommand(
+            Command::new("set")
+                .about("Sets the key/value pair in the database.")
+                .arg(&arg_key)
+                .arg(&arg_value)
+                .arg(
+                    Arg::new("force")
+                        .short('f')
+                        .long("force")
+                        .takes_value(false)
+                        .help("Overwrites existing key/value in the database."),
+                ),
+        )
+        .subcommand(
+            Command::new("remove")
+                .about("Removes the key/value pair in the database for a given key.")
+                .arg(&arg_key),
+        )
+        .get_matches();
 
     let mut db = Database::from_disk("kv.db")?;
-    db.insert(key, value);
+
+    match matches.subcommand() {
+        Some(("get", _matches)) => {
+            todo!();
+        }
+        Some(("set", matches)) => {
+            let key = matches.value_of("key").unwrap();
+            let value = matches.value_of("value").unwrap();
+
+            db.insert(key.to_string(), value.to_string());
+        }
+        Some(("remove", _matches)) => {
+            todo!();
+        }
+        _ => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Subcommand not specified or was unknown.",
+            ));
+        }
+    }
 
     Ok(())
 }
