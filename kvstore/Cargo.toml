@@ -9,3 +9,6 @@ authors = [ "Rick Rainey" ]
 
 [dependencies]
 clap = { version = "3.1.6", features = ["cargo"] }
+
+[profile.release]
+strip = true
