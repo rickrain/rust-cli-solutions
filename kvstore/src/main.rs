@@ -45,6 +45,7 @@ fn main() -> Result<(), Error> {
                 .about("Removes the key/value pair in the database for a given key.")
                 .arg(&arg_key),
         )
+        .subcommand(Command::new("init").about("Initalize a new empty key/value database."))
         .get_matches();
 
     let mut db = Database::from_disk("kv.db")?;
@@ -65,6 +66,9 @@ fn main() -> Result<(), Error> {
         }
         Some(("remove", _matches)) => {
             todo!();
+        }
+        Some(("init", _matches)) => {
+            db.init()?;
         }
         _ => {
             return Err(Error::new(
@@ -142,10 +146,18 @@ impl Database {
         Ok(true)
     }
 
+    // Initialize a new empty key/value database.
+    fn init(&mut self) -> std::io::Result<()> {
+        self.map.clear(); // Clear the HashMap entries
+        self.flush()?; // Flush the empty HashMap to disk
+
+        Ok(())
+    }
+
     // Persist the key/value database to disk.
     fn flush(&self) -> std::io::Result<()> {
         let mut options = OpenOptions::new();
-        let mut file = options.write(true).open(&self.db_filename)?;
+        let mut file = options.write(true).truncate(true).open(&self.db_filename)?;
 
         for (k, v) in &self.map {
             let line = format!("{}\t{}\n", k, v);
