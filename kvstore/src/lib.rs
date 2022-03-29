@@ -36,6 +36,7 @@ pub fn get_args() -> std::io::Result<SubCommand> {
         .version(clap::crate_version!())
         .author(clap::crate_authors!())
         .about(clap::crate_description!())
+        .subcommand_required(true)
         .subcommand(
             Command::new("get")
                 .about("Gets the value in the database associated with a given key.")
@@ -75,6 +76,9 @@ pub fn get_args() -> std::io::Result<SubCommand> {
             key: rm_matches.value_of("key").unwrap().to_string(),
         }),
         Some(("init", _init_matches)) => Ok(SubCommand::Init {}),
+
+        // This should never get executed since get_matches() will bubble up an
+        // error if there is not a subcommand provided.
         _ => Err(Error::new(
             ErrorKind::Other,
             "Subcommand not specified or was unknown.",
