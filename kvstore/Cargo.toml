@@ -2,7 +2,7 @@
 name = "kvstore"
 description = "A simple CLI providing a key/value database store."
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = [ "Rick Rainey" ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
