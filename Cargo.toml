@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "echor",
+    "catr",
+    "headr",
+    "kvstore",
+]
+resolver = "3"
+
+[profile.release]
+strip = true
