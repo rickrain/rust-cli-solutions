@@ -1,4 +1,4 @@
-use clap::{Command, Arg};
+use clap::{Arg, Command};
 
 fn main() {
     let matches = Command::new("echor")

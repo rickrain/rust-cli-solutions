@@ -26,6 +26,7 @@ impl Database {
             .read(true)
             .write(true)
             .create(true)
+            .truncate(false)
             .open(path)?;
 
         // Read contents of file as a single long String.
