@@ -1,3 +1,5 @@
+[![Rust](https://github.com/rickrain/rust-cli-solutions/actions/workflows/ci.yaml/badge.svg)](https://github.com/rickrain/rust-cli-solutions/actions/workflows/ci.yaml)
+
 # Introduction
 
 This repo contains code I created as I worked through the first third-to-half of the book [Command-Line Rust](https://www.oreilly.com/library/view/command-line-rust/9781098109424/).
