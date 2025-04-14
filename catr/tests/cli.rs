@@ -1,6 +1,6 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{Rng, distributions::Alphanumeric};
 use std::error::Error;
 use std::fs;
 
@@ -64,11 +64,7 @@ fn run(args: &[&str], expected_file: &str) -> TestResult {
 }
 
 // --------------------------------------------------
-fn run_stdin(
-    input_file: &str,
-    args: &[&str],
-    expected_file: &str,
-) -> TestResult {
+fn run_stdin(input_file: &str, args: &[&str], expected_file: &str) -> TestResult {
     let input = fs::read_to_string(input_file)?;
     let expected = fs::read_to_string(expected_file)?;
     Command::cargo_bin(PRG)?

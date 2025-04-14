@@ -8,7 +8,9 @@ const PRG: &str = "kvstore";
 #[test]
 fn no_args_will_show_usage() -> TestResult {
     let mut cmd = Command::cargo_bin(PRG)?;
-    cmd.assert().failure().stderr(predicate::str::contains("USAGE:\n"));
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains("USAGE:\n"));
     Ok(())
 }
 
@@ -19,16 +21,10 @@ fn init_set_get() -> TestResult {
     let get_args = ["get", "foo"];
 
     // Create a new empty database
-    Command::cargo_bin(PRG)?
-        .args(init_args)
-        .assert()
-        .success();
+    Command::cargo_bin(PRG)?.args(init_args).assert().success();
 
     // Add key/value pair
-    Command::cargo_bin(PRG)?
-        .args(set_args)
-        .assert()
-        .success();
+    Command::cargo_bin(PRG)?.args(set_args).assert().success();
 
     // Retrieve key/value pair
     Command::cargo_bin(PRG)?
