@@ -17,21 +17,16 @@ pub fn run(config: Config) -> MyResult<()> {
         match open(&filename) {
             Ok(f) => {
                 //println!("Opened {}", filename);
-                let mut lines_iter = f.lines().into_iter();
+                let lines_iter = f.lines();
                 let mut line_number = 1;
 
-                loop {
-                    if let Some(txt) = lines_iter.next() {
-                        let line = txt?;
-
-                        if config.number_lines || (config.number_nonblank_lines && !line.trim().is_empty()) {
-                            println!("{:>6}\t{}", line_number, line);
-                            line_number += 1;
-                        } else {
-                            println!("{}", line);
-                        }
+                for txt in lines_iter {
+                    let line = txt?;
+                    if config.number_lines || (config.number_nonblank_lines && !line.trim().is_empty()) {
+                        println!("{:>6}\t{}", line_number, line);
+                        line_number += 1;
                     } else {
-                        break;
+                        println!("{}", line);
                     }
                 }
             },
